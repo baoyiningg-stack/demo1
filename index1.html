@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>工具1 Demo · AI 新媒体内容工厂</title>
+  <style>
+    :root{
+      --ink:#17323a;
+      --soft:#50666d;
+      --muted:#7b8d93;
+      --paper:#edf3f1;
+      --surface:#ffffff;
+      --line:#d8e4e2;
+      --green:#5e8f2a;
+      --green-deep:#274a13;
+      --mint:#15a089;
+      --amber:#cf860f;
+      --purple:#6258c4;
+      --coral:#d66f4d;
+      --blue:#30798a;
+      --shadow:0 18px 42px rgba(23,50,58,.11);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-width:1180px;
+      background:var(--paper);
+      color:var(--ink);
+      font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+      line-height:1.55;
+    }
+    button,input,textarea{font:inherit}
+    .app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+    .side{
+      background:#14333a;
+      color:#d7ece8;
+      padding:26px 18px;
+      position:sticky;
+      top:0;
+      height:100vh;
+    }
+    .brand{font-weight:800;font-size:20px;line-height:1.25}
+    .brand small{display:block;margin-top:8px;color:#91bbb4;font-size:10px;letter-spacing:.16em}
+    .nav{margin-top:34px;display:grid;gap:7px}
+    .nav button{
+      border:0;
+      border-radius:10px;
+      background:transparent;
+      color:#aaccc5;
+      text-align:left;
+      padding:12px 12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .nav button.active,.nav button:hover{background:#28535a;color:#fff}
+    .side-note{
+      position:absolute;
+      left:18px;
+      right:18px;
+      bottom:22px;
+      border-top:1px solid rgba(255,255,255,.18);
+      padding-top:14px;
+      color:#a8cac3;
+      font-size:12px;
+    }
+    .main{padding:26px 34px 38px}
+    .top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:20px}
+    .eyebrow{font-size:11px;letter-spacing:.16em;color:var(--green);font-weight:800;text-transform:uppercase}
+    h1{margin:6px 0 4px;font-size:30px;letter-spacing:0;color:#14333a}
+    .sub{font-size:13px;color:var(--soft)}
+    .demo-badge{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 15px;
+      min-width:260px;
+      box-shadow:0 10px 24px rgba(23,50,58,.06);
+      font-size:12px;
+      color:var(--soft);
+    }
+    .demo-badge b{display:block;color:#14333a;font-size:15px;margin-top:2px}
+    .view{display:none}
+    .view.active{display:block}
+    .layout{display:grid;grid-template-columns:1.18fr .82fr;gap:18px}
+    .panel{
+      background:var(--surface);
+      border:1px solid #e4ecea;
+      border-radius:16px;
+      padding:19px;
+      box-shadow:var(--shadow);
+    }
+    .panel.flat{box-shadow:none}
+    .panel h2{margin:0 0 5px;font-size:18px;color:#14333a}
+    .hint{margin:0 0 15px;font-size:12px;color:var(--muted)}
+    .section-title{margin:16px 0 8px;color:#486169;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .chips{display:flex;flex-wrap:wrap;gap:7px}
+    .chip{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--soft);
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .chip.selected{border-color:var(--green);background:#eaf2de;color:var(--green-deep);font-weight:800}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:11px;color:var(--muted);font-weight:800}
+    .field input{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 11px;
+      color:var(--ink);
+      outline:none;
+    }
+    .field input:focus,textarea:focus{border-color:var(--green)}
+    .actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px}
+    .action{
+      border:0;
+      border-radius:10px;
+      background:var(--green);
+      color:#fff;
+      padding:10px 14px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .outline{
+      border:1px solid var(--green);
+      border-radius:10px;
+      background:#fff;
+      color:var(--green-deep);
+      padding:9px 13px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .summary{
+      border:1px solid #e6efeb;
+      background:#f9fbfa;
+      border-radius:12px;
+      padding:12px;
+      min-height:82px;
+    }
+    .summary .k{font-size:11px;color:var(--muted);font-weight:800}
+    .summary .v{font-size:13px;color:#14333a;margin-top:5px;font-weight:700}
+    .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px}
+    .step{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      min-height:82px;
+      position:relative;
+    }
+    .step.active{border-color:var(--green);box-shadow:0 8px 18px rgba(94,143,42,.14)}
+    .step b{display:block;font-size:12px;color:#14333a}
+    .step span{display:block;margin-top:5px;font-size:11px;color:var(--muted)}
+    .topics{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .topic{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      background:#fff;
+      cursor:pointer;
+      min-height:150px;
+    }
+    .topic.selected{border-color:var(--green);background:#fbfdf8}
+    .topic h3{margin:0 0 8px;font-size:16px;color:#14333a}
+    .topic p{margin:0 0 12px;font-size:12px;color:var(--soft)}
+    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tag{
+      border-radius:999px;
+      background:#eef4f3;
+      color:#536b71;
+      padding:4px 8px;
+      font-size:11px;
+      font-weight:700;
+    }
+    .tag.green{background:#eaf2de;color:var(--green-deep)}
+    .tag.amber{background:#fbeac9;color:#6b4406}
+    .tag.blue{background:#e7f0f2;color:#245764}
+    .content-grid{display:grid;grid-template-columns:1fr .86fr;gap:18px}
+    .tabs{display:flex;gap:7px;border-bottom:1px solid var(--line);margin-bottom:13px}
+    .tabs button{
+      border:0;
+      background:transparent;
+      border-bottom:2px solid transparent;
+      color:var(--muted);
+      padding:9px 5px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:800;
+    }
+    .tabs button.active{border-bottom-color:var(--green);color:#14333a}
+    textarea{
+      width:100%;
+      border:1px solid #dce8e5;
+      border-radius:12px;
+      background:#f9fbfa;
+      padding:14px;
+      color:#243f45;
+      resize:vertical;
+      min-height:340px;
+      outline:none;
+      font-size:13px;
+      line-height:1.75;
+    }
+    .output-list{display:grid;gap:9px}
+    .output{
+      display:grid;
+      grid-template-columns:42px 1fr;
+      gap:11px;
+      align-items:center;
+      border-bottom:1px solid #ecf2ef;
+      padding:9px 0;
+    }
+    .output:last-child{border-bottom:0}
+    .ico{
+      width:42px;height:42px;border-radius:10px;
+      display:grid;place-items:center;
+      background:#eaf2de;color:var(--green-deep);
+      font-weight:900;
+    }
+    .output b{font-size:13px;color:#14333a}
+    .output span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+
+    .xhs-workspace{display:none}
+    .xhs-workspace.active{display:block}
+    #contentText.is-hidden{display:none}
+    .pack-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+      padding:10px 12px;
+      border:1px solid #e6efeb;
+      border-radius:12px;
+      background:#fbfdf8;
+    }
+    .pack-head b{font-size:13px;color:#14333a}
+    .pack-head span{font-size:11px;color:var(--muted)}
+    .xhs-pack{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      max-height:430px;
+      overflow:auto;
+      padding-right:4px;
+    }
+    .xhs-card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+      min-height:238px;
+    }
+    .xhs-card.hero{
+      grid-column:1/-1;
+      display:grid;
+      grid-template-columns:168px 1fr;
+      min-height:210px;
+    }
+    .xhs-cover{
+      min-height:108px;
+      padding:12px;
+      background:linear-gradient(135deg,#eaf2de,#fff7e6);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .xhs-card.hero .xhs-cover{min-height:100%;border-right:1px solid var(--line)}
+    .xhs-cover .label{
+      align-self:flex-start;
+      border-radius:999px;
+      background:rgba(20,51,58,.82);
+      color:#fff;
+      padding:3px 8px;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+    .xhs-cover .cover-title{
+      color:#14333a;
+      font-size:18px;
+      line-height:1.25;
+      font-weight:900;
+    }
+    .xhs-body{padding:12px}
+    .xhs-body h3{margin:0 0 7px;font-size:14px;color:#14333a;line-height:1.35}
+    .xhs-body p{margin:0;font-size:11.5px;color:var(--soft);line-height:1.65}
+    .xhs-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+    .xhs-meta span{
+      border-radius:999px;
+      background:#eef4f3;
+      color:#536b71;
+      padding:3px 7px;
+      font-size:10.5px;
+      font-weight:800;
+    }
+    .xhs-pic{
+      margin-top:9px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:5px;
+    }
+    .xhs-pic i{
+      font-style:normal;
+      border:1px dashed #cddbd8;
+      border-radius:8px;
+      padding:6px 4px;
+      text-align:center;
+      color:var(--muted);
+      font-size:10px;
+      background:#f9fbfa;
+    }
+
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .variant{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      padding:14px;
+      min-height:210px;
+    }
+    .variant .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .variant .head b{font-size:13px}
+    .variant p{margin:0;font-size:12px;color:var(--soft);line-height:1.7}
+    .review-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:18px}
+    .checks{display:grid;gap:8px}
+    .check{
+      display:flex;
+      align-items:flex-start;
+      gap:9px;
+      border:1px solid #e6efeb;
+      border-radius:10px;
+      padding:10px;
+      font-size:12px;
+      color:var(--soft);
+      background:#fff;
+    }
+    .check input{width:16px;height:16px;accent-color:var(--green);margin-top:2px}
+    .rewrite{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+    .rewrite button{
+      border:1px solid var(--line);
+      background:#fff;
+      color:#14333a;
+      border-radius:10px;
+      padding:9px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .conversion{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .conv{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      padding:14px;
+    }
+    .conv h3{margin:0 0 8px;font-size:15px}
+    .conv p{margin:0;font-size:12px;color:var(--soft);line-height:1.75}
+    .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:14px}
+    .kpi{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:13px;
+    }
+    .kpi b{display:block;font-size:22px;color:#14333a}
+    .kpi span{font-size:11px;color:var(--muted)}
+    .toast{
+      position:fixed;
+      right:28px;
+      bottom:24px;
+      background:#14333a;
+      color:#fff;
+      border-radius:10px;
+      padding:12px 15px;
+      font-size:12px;
+      opacity:0;
+      transform:translateY(10px);
+      transition:.18s;
+    }
+    .toast.show{opacity:1;transform:none}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">工具1<br>AI 新媒体内容工厂<small>LOCAL CONTENT DEMO</small></div>
+    <nav class="nav">
+      <button class="active" data-view="profile">01 门店画像</button>
+      <button data-view="topics">02 选题雷达</button>
+      <button data-view="generate">03 生成内容包</button>
+      <button data-view="review">04 人工终审</button>
+      <button data-view="convert">05 转化与看板</button>
+    </nav>
+    <div class="side-note">真实场景：三线城市门店，内容产出不稳定。<br>目标：半天搞定一周内容。</div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div>
+        <div class="eyebrow">Demo · 工具1 · 引流</div>
+        <h1 id="pageTitle">门店画像输入</h1>
+        <div id="pageSub" class="sub">先让 AI 理解这家店，再生成本地化、差异化、可转化的内容。</div>
+      </div>
+      <div class="demo-badge">
+        当前门店
+        <b id="storeName">明眸眼镜 · 三线城市门店</b>
+        <span id="storeLine">学校附近｜学生与家长多｜开学季套餐</span>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="step active" data-step="profile"><b>门店画像</b><span>城市、商圈、客群、活动、语气</span></div>
+      <div class="step" data-step="topics"><b>选题雷达</b><span>行业热点 + 本地节点</span></div>
+      <div class="step" data-step="generate"><b>内容包</b><span>小红书、抖音、企微、物料</span></div>
+      <div class="step" data-step="review"><b>人工终审</b><span>改写、合规、人工确认</span></div>
+      <div class="step" data-step="convert"><b>转化动作</b><span>评论、私信、预约、到店</span></div>
+      <div class="step" data-step="convert"><b>效果看板</b><span>发布、私信、预约、到店</span></div>
+    </div>
+
+    <section id="profile" class="view active">
+      <div class="layout">
+        <div class="panel">
+          <h2>输入每家门店自己的信息</h2>
+          <p class="hint">这些字段决定同一个选题会生成不同内容。第一版 demo 用结构化选项模拟 AI 输入。</p>
+
+          <div class="section-title">城市和商圈</div>
+          <div class="chips" data-group="location"></div>
+
+          <div class="section-title">客群结构</div>
+          <div class="chips" data-group="audience"></div>
+
+          <div class="section-title">门店活动</div>
+          <div class="chips" data-group="campaign"></div>
+
+          <div class="section-title">主推品类</div>
+          <div class="chips" data-group="category"></div>
+
+          <div class="section-title">门店语气</div>
+          <div class="chips" data-group="tone"></div>
+
+          <div class="section-title">本地元素</div>
+          <div class="chips" data-group="local"></div>
+
+          <div class="section-title">可自定义补充</div>
+          <div class="field-row">
+            <div class="field"><label>附近学校/小区/商圈</label><input id="localName" value="城南实验小学、万达广场"></div>
+            <div class="field"><label>本周活动说明</label><input id="campaignDetail" value="开学季免费验光，学生镜架 8 折"></div>
+          </div>
+
+          <div class="actions">
+            <button class="action" id="saveProfile">保存画像，进入选题雷达</button>
+            <button class="outline" id="resetProfile">恢复示例门店</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>AI 生成前会读取什么</h2>
+          <p class="hint">不是让模型凭空写，而是把门店经营信息、内容模板和合规规则一起放进去。</p>
+          <div class="summary-grid">
+            <div class="summary"><div class="k">门店位置</div><div class="v" id="sumLocation"></div></div>
+            <div class="summary"><div class="k">核心客群</div><div class="v" id="sumAudience"></div></div>
+            <div class="summary"><div class="k">活动入口</div><div class="v" id="sumCampaign"></div></div>
+            <div class="summary"><div class="k">主推方向</div><div class="v" id="sumCategory"></div></div>
+            <div class="summary"><div class="k">表达风格</div><div class="v" id="sumTone"></div></div>
+            <div class="summary"><div class="k">本地素材</div><div class="v" id="sumLocal"></div></div>
+          </div>
+          <div class="section-title">一句话定位</div>
+          <div class="summary" style="min-height:108px">
+            <div class="v" id="positioning"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="topics" class="view">
+      <div class="panel">
+        <h2>本周选题雷达</h2>
+        <p class="hint">围绕“专业科普 + 本地节点 + 到店理由”推荐选题。点击选题后进入内容包生成。</p>
+        <div class="topics" id="topicList"></div>
+      </div>
+    </section>
+
+    <section id="generate" class="view">
+      <div class="content-grid">
+        <div class="panel">
+          <h2>一键生成内容包</h2>
+          <p class="hint">小红书不只生成正文，而是生成 5 篇完整图文卡：标题、封面文案、配图/拍摄建议、正文、标签和转化口径。</p>
+          <div class="tabs">
+            <button class="active" data-output="xhs">小红书图文</button>
+            <button data-output="douyin">抖音脚本</button>
+            <button data-output="comments">评论/私信</button>
+            <button data-output="poster">活动物料</button>
+            <button data-output="qwx">企微话术</button>
+          </div>
+          <div id="xhsWorkspace" class="xhs-workspace">
+            <div class="pack-head">
+              <div><b>5 篇小红书图文卡</b><br><span>覆盖科普、误区、案例、活动、回顾；每篇都带封面和配图建议。</span></div>
+              <span>可复制为发布清单 / 送入终审</span>
+            </div>
+            <div id="xhsPack" class="xhs-pack"></div>
+          </div>
+          <textarea id="contentText"></textarea>
+          <div class="actions">
+            <button class="outline" id="copyContent">复制当前文案</button>
+            <button class="action" id="sendReview">送入人工终审</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>本周内容包清单</h2>
+          <p class="hint">用“5 条小红书 + 2 条抖音脚本”覆盖一周基础内容，再配转化话术和门店物料。</p>
+          <div class="output-list">
+            <div class="output"><div class="ico">5</div><div><b>小红书图文</b><span>科普、误区、案例、活动、回顾｜含封面、配图建议、正文、标签</span></div></div>
+            <div class="output"><div class="ico">2</div><div><b>抖音脚本</b><span>30 秒口播 + 门店服务场景</span></div></div>
+            <div class="output"><div class="ico">3</div><div><b>评论区回复</b><span>关键词引导私信与预约验光</span></div></div>
+            <div class="output"><div class="ico">1</div><div><b>门店活动物料</b><span>海报标题、展架文案、朋友圈配文</span></div></div>
+            <div class="output"><div class="ico">1</div><div><b>企微欢迎语</b><span>从内容互动承接到私域咨询</span></div></div>
+            <div class="output"><div class="ico">1</div><div><b>预约提醒</b><span>提醒时间、地址、服务内容</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel flat" style="margin-top:18px">
+        <h2>同一选题，不同门店生成示意</h2>
+        <p class="hint">这里展示为什么需要 AI：同样是“高度近视怎么选镜片”，学校附近、社区店、商场店的说法不能一样。</p>
+        <div class="compare" id="compareVariants"></div>
+      </div>
+    </section>
+
+    <section id="review" class="view">
+      <div class="review-grid">
+        <div class="panel">
+          <h2>人工终审编辑器</h2>
+          <p class="hint">AI 只做初稿与改写，店主/运营最终确认后才发布。</p>
+          <textarea id="reviewText"></textarea>
+          <div class="rewrite">
+            <button data-rewrite="professional">改得更专业</button>
+            <button data-rewrite="friendly">改得更亲切</button>
+            <button data-rewrite="local">加入本地元素</button>
+            <button data-rewrite="boss">生成老板出镜版</button>
+            <button data-rewrite="xhs">更像小红书</button>
+            <button data-rewrite="lessad">降低广告感</button>
+          </div>
+          <div class="actions">
+            <button class="outline" id="saveDraft">保存修改</button>
+            <button class="action" id="approveContent">审核通过，进入发布清单</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>合规与质量检查</h2>
+          <p class="hint">尤其适合眼镜店：专业表达要清楚，但不能夸大功效或医疗化承诺。</p>
+          <div class="checks">
+            <label class="check"><input type="checkbox" checked>未承诺治疗效果，未使用“保证”“根治”等绝对化表达</label>
+            <label class="check"><input type="checkbox" checked>没有夸大镜片功能，保留到店验光或专业检查建议</label>
+            <label class="check"><input type="checkbox" checked>活动权益、时间、地址、预约入口准确</label>
+            <label class="check"><input type="checkbox" checked>没有虚构顾客案例或效果评价</label>
+            <label class="check"><input type="checkbox">店主/运营已完成最终人工确认</label>
+          </div>
+          <div class="section-title">系统提示</div>
+          <div class="summary" style="min-height:96px">
+            <div class="v" id="reviewStatus">待人工确认。系统不会自动发布内容。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="convert" class="view">
+      <div class="panel">
+        <h2>发布后的转化动作</h2>
+        <p class="hint">工具1不是“写完就结束”，而是把内容接到私信、企微、预约验光和到店。</p>
+        <div class="conversion">
+          <div class="conv"><h3>评论区引导</h3><p id="convComment"></p></div>
+          <div class="conv"><h3>企微承接</h3><p id="convWechat"></p></div>
+          <div class="conv"><h3>预约提醒</h3><p id="convReminder"></p></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>效果看板示意</h2>
+        <p class="hint">第一版用模拟数据展示闭环指标，真实上线后可接发布记录、企微线索和到店预约数据。</p>
+        <div class="kpis">
+          <div class="kpi"><b>7</b><span>本周生成内容</span></div>
+          <div class="kpi"><b>5</b><span>已发布内容</span></div>
+          <div class="kpi"><b>18</b><span>评论/私信</span></div>
+          <div class="kpi"><b>6</b><span>预约验光</span></div>
+          <div class="kpi"><b>3</b><span>实际到店</span></div>
+          <div class="kpi"><b>0.5天</b><span>一周内容耗时</span></div>
+        </div>
+        <div class="section-title">下周建议</div>
+        <div class="summary" style="min-height:86px">
+          <div class="v" id="nextAdvice"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast">已完成</div>
+
+<script>
+const $ = (s)=>document.querySelector(s);
+const $$ = (s)=>Array.from(document.querySelectorAll(s));
+const groups = {
+  location:['三线城市','学校附近','社区店','商场店'],
+  audience:['学生多','家长多','上班族多','老年人多'],
+  campaign:['免费验光','开学季套餐','镜架折扣','老客转介绍'],
+  category:['高度近视镜片','儿童离焦镜片','防蓝光','渐进片'],
+  tone:['专业型','亲切型','老板本人出镜型'],
+  local:['附近学校','附近小区','商圈名称','本周天气','节日节点']
+};
+const selected = {
+  location:'学校附近',
+  audience:'学生多',
+  campaign:'开学季套餐',
+  category:'高度近视镜片',
+  tone:'亲切型',
+  local:'附近学校'
+};
+const labels = {
+  profile:['门店画像输入','先让 AI 理解这家店，再生成本地化、差异化、可转化的内容。'],
+  topics:['选题雷达','从行业热点、本地节点和门店活动里，筛出本周最值得做的内容。'],
+  generate:['生成内容包','一次生成 5 条小红书、2 条抖音脚本，以及评论、企微和活动物料。'],
+  review:['人工终审','AI 做初稿和改写，店主确认真实、专业与合规。'],
+  convert:['转化与效果看板','把内容接到私信、企微、预约验光和到店转化。']
+};
+const topics = [
+  {id:'high',title:'高度近视怎么选镜片才不厚？',people:'学生 / 上班族',platform:'小红书 / 抖音',goal:'预约验光',campaign:'免费验光 + 高折射率咨询'},
+  {id:'child',title:'孩子近视防控，家长最容易踩的 3 个坑',people:'家长',platform:'小红书 / 公众号',goal:'儿童验光预约',campaign:'开学季套餐'},
+  {id:'school',title:'开学前为什么建议重新验光？',people:'学生 / 家长',platform:'小红书 / 社群',goal:'到店检查',campaign:'免费验光'},
+  {id:'blue',title:'长期看电脑，防蓝光到底有没有必要？',people:'上班族',platform:'抖音 / 小红书',goal:'咨询与到店体验',campaign:'镜片体验活动'},
+  {id:'progressive',title:'爸妈看近看远都不清楚，是不是该配渐进片？',people:'老年人 / 子女',platform:'朋友圈 / 社群',goal:'远近用眼检查',campaign:'渐进片咨询'},
+  {id:'frame',title:'换镜架怎么选？不要只看脸型',people:'年轻顾客',platform:'小红书 / 抖音',goal:'到店试戴',campaign:'镜架折扣'}
+];
+let currentTopic = topics[0];
+let currentOutput = 'xhs';
+
+function toast(text){
+  const el = $('#toast');
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1700);
+}
+function line(){
+  return `${selected.location}｜${selected.audience}｜${selected.campaign}｜${selected.category}`;
+}
+function summary(){
+  $('#sumLocation').textContent = selected.location;
+  $('#sumAudience').textContent = selected.audience;
+  $('#sumCampaign').textContent = selected.campaign;
+  $('#sumCategory').textContent = selected.category;
+  $('#sumTone').textContent = selected.tone;
+  $('#sumLocal').textContent = `${selected.local}：${$('#localName').value}`;
+  $('#storeLine').textContent = line();
+  $('#positioning').textContent = `这是一家位于${selected.location}的眼镜店，主要面对${selected.audience}，本周主推${selected.campaign}和${selected.category}。内容语气偏${selected.tone}，需要自然带入${selected.local}，把专业科普转成预约到店的理由。`;
+}
+function renderChips(){
+  Object.keys(groups).forEach((group)=>{
+    const box = $(`[data-group="${group}"]`);
+    box.innerHTML = '';
+    groups[group].forEach((item)=>{
+      const btn = document.createElement('button');
+      btn.className = 'chip' + (selected[group] === item ? ' selected' : '');
+      btn.textContent = item;
+      btn.onclick = ()=>{
+        selected[group] = item;
+        renderChips();
+        summary();
+        renderContent();
+        toast('已更新门店画像');
+      };
+      box.appendChild(btn);
+    });
+  });
+}
+function switchView(id){
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  $('#'+id).classList.add('active');
+  $$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
+  $$('.step').forEach(s=>s.classList.toggle('active',s.dataset.step===id));
+  $('#pageTitle').textContent = labels[id][0];
+  $('#pageSub').textContent = labels[id][1];
+}
+function renderTopics(){
+  const box = $('#topicList');
+  box.innerHTML = '';
+  topics.forEach((t)=>{
+    const card = document.createElement('div');
+    card.className = 'topic' + (t.id === currentTopic.id ? ' selected' : '');
+    card.innerHTML = `<h3>${t.title}</h3><p>适合人群：${t.people}<br>推荐平台：${t.platform}<br>转化目标：${t.goal}</p><div class="tags"><span class="tag green">${t.campaign}</span><span class="tag amber">${selected.campaign}</span><span class="tag blue">${selected.local}</span></div>`;
+    card.onclick = ()=>{
+      currentTopic = t;
+      renderTopics();
+      renderContent();
+      switchView('generate');
+      toast('已选择选题并生成内容包');
+    };
+    box.appendChild(card);
+  });
+}
+function storeOpening(){
+  const localName = $('#localName').value || '附近学校和商圈';
+  if(selected.location === '学校附近') return `最近开学季，${localName}周边不少学生来店里问`;
+  if(selected.location === '社区店') return `最近附近小区里，很多家长和老顾客来店里问`;
+  if(selected.location === '商场店') return `周末在商场试镜时，我们发现很多顾客第一句话就是`;
+  return `在我们这座三线城市，最近进店咨询最多的问题是`;
+}
+function toneSentence(){
+  if(selected.tone === '专业型') return '我们会先看度数、瞳距、镜框大小和日常用眼场景，再判断方案是否合适。';
+  if(selected.tone === '老板本人出镜型') return '我是店主，平时接待时最常提醒大家：镜片薄不薄，不能只看价格，还要看框型和使用场景。';
+  return '不用一上来就买贵的，先把自己的度数、预算和佩戴习惯说清楚，方案会更稳。';
+}
+function localHook(){
+  const localName = $('#localName').value || '附近学校和商圈';
+  if(selected.local === '本周天气') return '这周天气闷热，眼镜压鼻梁、镜架滑落的问题也会更明显。';
+  if(selected.local === '节日节点') return '趁开学季，把验光、镜架调校和选镜建议一次做完。';
+  if(selected.local === '商圈名称') return `如果你就在${localName}附近，路过可以先进店做一次基础检查。`;
+  return `如果你在${localName}附近，可以提前预约，减少排队等待。`;
+}
+function contentPack(){
+  const detail = $('#campaignDetail').value || selected.campaign;
+  const opening = storeOpening();
+  const tone = toneSentence();
+  const hook = localHook();
+  const title = currentTopic.title;
+  return {
+    xhs:`标题：${title}\n\n${opening}：“我这个度数，镜片是不是一定会很厚？”\n\n其实选镜不能只看镜片价格。${selected.category}要同时看度数、瞳距、镜框大小、预算和日常用眼场景。\n\n${tone}\n\n本周门店活动：${detail}。\n${hook}\n\n评论区可以留言“验光”，我发你一份选镜前检查清单。`,
+    douyin:`30 秒口播脚本｜${title}\n\n镜头 1：店主拿起一副大框和一副小框\n口播：同样是高度近视，为什么有的人镜片看起来更厚？\n\n镜头 2：展示验光单和镜框对比\n口播：关键不只在镜片，还在度数、瞳距和镜框大小。框太大，边缘就更容易显厚。\n\n镜头 3：门店服务场景\n口播：${tone}\n\n镜头 4：活动海报\n口播：本周${detail}，在${$('#localName').value}附近的朋友可以提前预约。`,
+    comments:`评论区回复 1：\n如果你是 600 度以上，担心镜片厚，可以私信我“高度近视”，我发你一份选镜 checklist。\n\n评论区回复 2：\n镜片厚不厚，和度数、折射率、框型大小、瞳距都有关系。建议先验光，再看适合哪类镜框。\n\n私信承接：\n你好，我看到你咨询的是“${title}”。你可以先告诉我大概度数、预算和常用场景，我帮你判断到店时重点看什么。`,
+    poster:`门店活动物料文案\n\n主标题：开学季专业验光与选镜建议\n副标题：高度近视镜片厚度咨询｜镜架试戴｜基础验光\n\n活动内容：${detail}\n适合人群：${selected.audience}\n门店位置：${$('#localName').value}\n\n底部提示：验光与选镜建议需结合个人度数、瞳距和用眼习惯，由门店人员现场确认。`,
+    qwx:`企微欢迎语：\n你好，我是明眸眼镜的店主。你刚刚咨询的是“${title}”。\n\n我可以先帮你看一下大概适合哪类镜框和镜片方向。方便的话，把你的大概度数、预算和常用场景发我；也可以预约到店做一次基础验光。\n\n预约提醒：\n你预约的是明天下午 3 点。到店后我们会先看度数、瞳距和日常用眼场景，再给你选镜建议。`
+  };
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g,(m)=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+function xhsPosts(){
+  const localName = $('#localName').value || '附近学校和商圈';
+  const detail = $('#campaignDetail').value || selected.campaign;
+  const title = currentTopic.title;
+  return [
+    {
+      type:'科普',
+      title:title,
+      cover:'高度近视镜片厚？先看这 3 件事',
+      body:`把“度数、瞳距、框型大小、折射率”讲清楚，告诉用户为什么不是越贵越薄，而是要先验光再匹配框型。自然带入${detail}。`,
+      pics:['验光单局部','大框/小框对比','镜片边缘示意'],
+      tags:['#高度近视','#配镜避坑','#验光']
+    },
+    {
+      type:'误区',
+      title:'别只问镜片多少钱，先避开这个坑',
+      cover:'同样 800 度，为什么有人更厚？',
+      body:`用门店真实接待口吻解释“框太大、瞳距不匹配、忽略佩戴场景”带来的厚重感，结尾引导评论“验光”领取清单。`,
+      pics:['错误大框示例','正确小框示例','导购讲解场景'],
+      tags:['#眼镜店日常','#高度近视','#镜框怎么选']
+    },
+    {
+      type:'案例',
+      title:`${selected.audience}配镜案例：预算有限怎么选？`,
+      cover:'预算有限，也能配得稳',
+      body:`模拟一位学生顾客：预算有限、度数高、担心厚重。展示从需求沟通到推荐方案的过程，强调“先满足安全和舒适，再谈升级”。`,
+      pics:['顾客需求卡','5 副候选镜架','试戴对比']
+    },
+    {
+      type:'活动',
+      title:`${localName}附近，开学前可以先做一次验光`,
+      cover:'开学季配镜前，先检查这几项',
+      body:`结合本地学校/商圈与${detail}，写成低广告感活动帖：免费验光、镜架调校、选镜建议，明确预约方式和到店地址。`,
+      pics:['门店门头','活动桌牌','验光区']
+    },
+    {
+      type:'回顾',
+      title:'本周门店被问最多的 5 个配镜问题',
+      cover:'一周配镜问题合集',
+      body:`把评论区和到店咨询沉淀成内容回顾：镜片厚、预算、框型、散光、多久复查。结尾提示下周继续做答疑。`,
+      pics:['评论截图打码','门店服务瞬间','答疑清单']
+    }
+  ];
+}
+function renderXhsPack(){
+  const posts = xhsPosts();
+  $('#xhsPack').innerHTML = posts.map((p,i)=>`
+    <div class="xhs-card ${i===0?'hero':''}">
+      <div class="xhs-cover">
+        <span class="label">${String(i+1).padStart(2,'0')} · ${escapeHtml(p.type)}</span>
+        <div class="cover-title">${escapeHtml(p.cover)}</div>
+      </div>
+      <div class="xhs-body">
+        <h3>${escapeHtml(p.title)}</h3>
+        <p><b>正文方向：</b>${escapeHtml(p.body)}</p>
+        <div class="xhs-pic">${p.pics.map(pic=>`<i>${escapeHtml(pic)}</i>`).join('')}</div>
+        <div class="xhs-meta">${(p.tags || ['#小红书图文','#门店内容','#预约验光']).map(t=>`<span>${escapeHtml(t)}</span>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+  $('#contentText').value = posts.map((p,i)=>`小红书图文 ${i+1}｜${p.type}
+标题：${p.title}
+封面文案：${p.cover}
+配图/拍摄建议：${p.pics.join(' / ')}
+正文方向：${p.body}
+标签：${(p.tags || ['#小红书图文','#门店内容','#预约验光']).join(' ')}`).join('\n\n---\n\n');
+}
+
+function renderContent(){
+  const isXhs = currentOutput === 'xhs';
+  $('#xhsWorkspace').classList.toggle('active', isXhs);
+  $('#contentText').classList.toggle('is-hidden', isXhs);
+  if(isXhs){
+    renderXhsPack();
+  }else{
+    $('#contentText').value = contentPack()[currentOutput];
+  }
+  if(!$('#reviewText').value) $('#reviewText').value = $('#contentText').value;
+  $$('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.output===currentOutput));
+  $('#convComment').textContent = '如果你也是高度近视，担心镜片厚，可以评论或私信“高度近视”，领取选镜 checklist。';
+  $('#convWechat').textContent = '企微自动带出顾客来源、选题关键词和门店活动，导购确认后手动发送欢迎语。';
+  $('#convReminder').textContent = `预约前一天提醒：到店先做基础验光，再结合${selected.category}和预算看方案。`;
+  $('#nextAdvice').textContent = `继续围绕“${currentTopic.title}”做 2 条后续内容，并测试${selected.tone}和“${selected.local}”两种表达对私信率的影响。`;
+  renderCompare();
+}
+function renderCompare(){
+  const examples = [
+    ['学校附近门店','最近开学季，不少学生来店里问：我 600 度以上，镜片是不是一定会很厚？其实高度近视选镜片，不能只看价格，还要看折射率、框型大小和瞳距匹配。'],
+    ['社区店','最近很多小区家长带孩子来验光，最担心的是度数涨了以后镜片越来越厚。高度近视配镜，镜框大小和镜片折射率都很关键。'],
+    ['商场店','周末试镜时发现，很多高度近视顾客第一句话就是：有没有看起来薄一点的方案？其实想让镜片更轻薄，不是只换贵镜片，还要选对框型。']
+  ];
+  $('#compareVariants').innerHTML = examples.map((e,i)=>`<div class="variant"><div class="head"><b>${e[0]}</b><span class="tag ${i===0?'green':i===1?'amber':'blue'}">差异化</span></div><p>${e[1]}</p></div>`).join('');
+}
+
+$('#saveProfile').onclick = ()=>{summary();renderTopics();switchView('topics');toast('门店画像已保存');};
+$('#resetProfile').onclick = ()=>{
+  selected.location='学校附近';
+  selected.audience='学生多';
+  selected.campaign='开学季套餐';
+  selected.category='高度近视镜片';
+  selected.tone='亲切型';
+  selected.local='附近学校';
+  $('#localName').value='城南实验小学、万达广场';
+  $('#campaignDetail').value='开学季免费验光，学生镜架 8 折';
+  renderChips();summary();renderContent();toast('已恢复示例门店');
+};
+$$('.nav button').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+$$('.tabs button').forEach(b=>b.onclick=()=>{currentOutput=b.dataset.output;renderContent();});
+$('#copyContent').onclick = ()=>navigator.clipboard.writeText($('#contentText').value).then(()=>toast('已复制当前文案')).catch(()=>toast('请手动复制文本'));
+$('#sendReview').onclick = ()=>{$('#reviewText').value=$('#contentText').value;switchView('review');toast('已送入人工终审');};
+$('#saveDraft').onclick = ()=>toast('修改已保存');
+$('#approveContent').onclick = ()=>{
+  const allChecked = $$('#review .check input').every(x=>x.checked);
+  if(!allChecked){toast('请完成全部审核项');return;}
+  $('#reviewStatus').textContent = '已审核通过，进入发布清单。内容将由店主或导购手动发布，不自动群发。';
+  switchView('convert');
+  toast('审核通过，已进入发布清单');
+};
+$$('[data-rewrite]').forEach(btn=>{
+  btn.onclick=()=>{
+    const type = btn.dataset.rewrite;
+    let extra = '';
+    if(type==='professional') extra = '\n\n专业版补充：建议结合验光数据、瞳距和镜框尺寸综合判断，不建议只凭度数直接决定镜片方案。';
+    if(type==='friendly') extra = '\n\n亲切版补充：不用担心一进店就被推销，先检查清楚，再慢慢看适合自己的方案。';
+    if(type==='local') extra = `\n\n本地化补充：${localHook()}`;
+    if(type==='boss') extra = '\n\n老板出镜版：我是这家店的店主，今天用 30 秒讲清楚高度近视选镜片最容易忽略的一点。';
+    if(type==='xhs') extra = '\n\n小红书标题备选：高度近视显镜片厚？先看这 3 件事。';
+    if(type==='lessad') extra = '\n\n降低广告感：这条内容先讲判断方法，活动信息放在最后一句，不打扰用户阅读。';
+    $('#reviewText').value += extra;
+    toast('已追加改写建议');
+  };
+});
+['localName','campaignDetail'].forEach(id=>$('#'+id).addEventListener('input',()=>{summary();renderContent();}));
+
+renderChips();
+summary();
+renderTopics();
+renderContent();
+</script>
+</body>
+</html>
